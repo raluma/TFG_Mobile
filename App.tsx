@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import {Calendar, LocaleConfig, Agenda} from 'react-native-calendars';
 
 export default function App() {
-  const [selected, setSelected] = useState('');
+  const [selected, setSelected] = useState("");
 
   return (
     <View style={styles.container}>
@@ -13,7 +13,7 @@ export default function App() {
           setSelected(day.dateString);
         }}
         markedDates={{
-          [selected]: {selected: true, disableTouchEvent: true, selectedDotColor: 'orange'}
+          [selected]: {selected: true, disableTouchEvent: true}
         }}
       />
     </View>
