@@ -2,6 +2,7 @@ import { addDays, format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Agenda } from 'react-native-calendars';
+import { DB, USERNAME, PASSWORD, HOST } from "@env";
 
 type Item = {
   name: string;
@@ -20,6 +21,8 @@ const App: React.FC = () => {
 
   useEffect(() => {
     // run once
+    
+    console.log(DB);
 
     const getData = async () => {
       const response = await fetch(
