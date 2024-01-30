@@ -1,9 +1,15 @@
-const { Sequelize } = require("sequelize");
 import { DB, USERNAME, PASSWORD, HOST } from "@env";
+import { Sequelize } from "sequelize-typescript";
+import { Dialect } from "sequelize";
 
-const sequelize = new Sequelize(DB, USERNAME, PASSWORD, {
+const dialect : Dialect = "postgres"
+
+const sequelize = new Sequelize({
+    dialect: dialect,
     host: HOST,
-    dialect: 'postgres' 
+    username: USERNAME,
+    password: PASSWORD,
+    database: DB
 });
 
 export const testingDBConnection = async () => {
