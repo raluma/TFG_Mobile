@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo/webpack-config": "^19.0.0",
+    "@react-native-firebase/app": "^18.8.0",
     "@types/react": "~18.2.14",
     "@types/react-native-calendars": "^1.1264.6",
     "date-fns": "^2.30.0",
