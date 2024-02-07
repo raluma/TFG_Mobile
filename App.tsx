@@ -2,7 +2,8 @@ import { addDays, format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Agenda } from 'react-native-calendars';
-import firestore from '@react-native-firebase/app'
+import { db } from './firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 type Item = {
   name: string;
@@ -51,8 +52,9 @@ const App: React.FC = () => {
       setItems(reduced);
     };
 
-    const loadFireData = async () => {
-    }
+    const task = onSnapshot(collection(db, "Events"), (snapshot) => {
+      const collection = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+    });
 
     getData();
   }, []);
