@@ -7,13 +7,13 @@ import { collection, onSnapshot } from 'firebase/firestore';
 
 type Item = {
   name: string;
-  cookies: boolean;
 };
 
 type Post = {
   id: number;
-  title: string;
-  body: string;
+  name: string;
+  height: number;
+  day: string;
   userId: number;
 };
 
@@ -23,17 +23,55 @@ const App: React.FC = () => {
   useEffect(() => {
     // run once
 
-    const getData = async () => {
-      const response = await fetch(
-        'https://jsonplaceholder.typicode.com/posts',
-      );
-      const data: Post[] = await response.json();
+    // const getData = async () => {
+    //   const response = await fetch(
+    //     'https://jsonplaceholder.typicode.com/posts',
+    //   );
+    //   const data: Post[] = await response.json();
 
-      const mappedData = data.map((post, index) => {
+    //   const mappedData = data.map((post, index) => {
+    //     const date = addDays(new Date(), index);
+
+    //     return {
+    //       ...post,
+    //       date: format(date, 'yyyy-MM-dd'),
+    //     };
+    //   });
+
+    //   const reduced = mappedData.reduce(
+    //     (acc: {[key: string]: Post[]}, currentItem) => {
+    //       const {date, ...coolItem} = currentItem;
+
+    //       acc[date] = [coolItem];
+
+    //       return acc;
+    //     },
+    //     {},
+    //   );
+
+    //   setItems(reduced);
+    // };
+
+    const getData = onSnapshot(collection(db, "Events"), (snapshot) => {
+        // const collection = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+
+
+      const mappedData = snapshot.docs.map((doc, index) => {
         const date = addDays(new Date(), index);
+        // Falta cambiar estas contantes por las que vendrían del doc
+        const id = 1;
+        const name = "test";
+        const height = 2;
+        const day = "test";
+        const userId = 1;
 
         return {
-          ...post,
+          ...{ 
+            id: id, 
+            name: name, 
+            height: height, 
+            day: day, 
+            userId: userId },
           date: format(date, 'yyyy-MM-dd'),
         };
       });
@@ -50,10 +88,6 @@ const App: React.FC = () => {
       );
 
       setItems(reduced);
-    };
-
-    const task = onSnapshot(collection(db, "Events"), (snapshot) => {
-      const collection = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
     });
 
     getData();
@@ -63,7 +97,7 @@ const App: React.FC = () => {
     return (
       <View style={styles.itemContainer}>
         <Text>{item.name}</Text>
-        <Text>{item.cookies ? `🍪` : `😋`}</Text>
+        <Text>test</Text>
       </View>
     );
   };
