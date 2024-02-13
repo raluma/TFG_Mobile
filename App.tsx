@@ -2,20 +2,11 @@ import { addDays, format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Agenda } from 'react-native-calendars';
+import Card from './src/components/Card';
+import { Item, Post } from './src/types/agenda';
 import { db } from './firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 
-type Item = {
-  name: string;
-};
-
-type Post = {
-  id: number;
-  name: string;
-  height: number;
-  day: string;
-  userId: number;
-};
 
 const App: React.FC = () => {
   const [items, setItems] = useState<{[key: string]: Post[]}>({});
@@ -23,18 +14,72 @@ const App: React.FC = () => {
   useEffect(() => {
     // run once
 
-    // const getData = async () => {
-    //   const response = await fetch(
-    //     'https://jsonplaceholder.typicode.com/posts',
-    //   );
-    //   const data: Post[] = await response.json();
+    const getData = () => {
 
-    //   const mappedData = data.map((post, index) => {
-    //     const date = addDays(new Date(), index);
+      const data: Post[] = [
+        {
+          id: 1,
+          name: "Cocinar almuerzo",
+          tag: "Cocina",
+          time: "10:00 - 11:00",
+          height: 0,
+          day: "10",
+          userId: 1,
+        },
+        {
+          id: 2,
+          name: "Ir a la cancha",
+          tag: "Deporte",
+          time: "10:00 - 11:00",
+          height: 0,
+          day: "12",
+          userId: 1,
+        }
+      ]
+
+      const mappedData = data.map((post, index) => {
+        // const date = addDays(new Date(), index);
+        const date = "2024-02-13";
+
+        return {
+          ...post,
+          date: date,
+        };
+      });
+
+      const reduced = mappedData.reduce(
+        (acc: {[key: string]: Post[]}, currentItem) => {
+          const {date, ...item} = currentItem;
+
+          // Si es un array se añade y NO se reeplaza
+          if (Array.isArray(acc[date])) {
+            acc[date].push(item);
+          } else {
+            acc[date] = [item];
+          }
+
+          return acc;
+        },
+        {},
+      );
+
+      setItems(reduced);
+    };
+
+    // const getData = onSnapshot(collection(db, "Events"), (snapshot) => {
+    //   const mappedData = snapshot.docs.map((doc, index) => {
 
     //     return {
-    //       ...post,
-    //       date: format(date, 'yyyy-MM-dd'),
+    //       ...{ 
+    //         id: parseInt(doc.id), 
+    //         name: doc.data()["name"], 
+    //         tag: doc.data()["tag"],
+    //         time: doc.data()["time"],
+    //         height: parseInt(doc.data()["height"]), 
+    //         day: doc.data()["day"], 
+    //         userId: parseInt(doc.data()["userId"])
+    //       },
+    //       date: doc.data()["date"],
     //     };
     //   });
 
@@ -50,61 +95,22 @@ const App: React.FC = () => {
     //   );
 
     //   setItems(reduced);
-    // };
-
-    const getData = onSnapshot(collection(db, "Events"), (snapshot) => {
-        // const collection = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-
-
-      const mappedData = snapshot.docs.map((doc, index) => {
-        const date = addDays(new Date(), index);
-        // Falta cambiar estas contantes por las que vendrían del doc
-        const id = 1;
-        const name = "test";
-        const height = 2;
-        const day = "test";
-        const userId = 1;
-
-        return {
-          ...{ 
-            id: id, 
-            name: name, 
-            height: height, 
-            day: day, 
-            userId: userId },
-          date: format(date, 'yyyy-MM-dd'),
-        };
-      });
-
-      const reduced = mappedData.reduce(
-        (acc: {[key: string]: Post[]}, currentItem) => {
-          const {date, ...coolItem} = currentItem;
-
-          acc[date] = [coolItem];
-
-          return acc;
-        },
-        {},
-      );
-
-      setItems(reduced);
-    });
+    // });
 
     getData();
   }, []);
 
-  const renderItem = (item: Item) => {
+  const renderEmptyDate = () => {
     return (
-      <View style={styles.itemContainer}>
-        <Text>{item.name}</Text>
-        <Text>test</Text>
+      <View>
+        <Text>This is empty date!</Text>
       </View>
     );
   };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <Agenda items={items} renderItem={renderItem} />
+      <Agenda items={items} renderItem={Card} />
     </SafeAreaView>
   );
 };
@@ -112,15 +118,7 @@ const App: React.FC = () => {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-  },
-  itemContainer: {
-    backgroundColor: 'white',
-    margin: 5,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-  },
+  }
 });
 
 export default App;
