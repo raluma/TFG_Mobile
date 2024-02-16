@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { Agenda } from 'react-native-calendars';
 import Card from './src/components/Card';
+import ModalAction from './src/components/ModalAction';
+import { useModalStore } from './src/services/modalStage';
 import { Item, Post } from './src/types/agenda';
 import { db } from './firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
@@ -39,7 +41,7 @@ const App: React.FC = () => {
 
       const mappedData = data.map((post, index) => {
         // const date = addDays(new Date(), index);
-        const date = "2024-02-13";
+        const date = "2024-02-16";
 
         return {
           ...post,
@@ -51,7 +53,6 @@ const App: React.FC = () => {
         (acc: {[key: string]: Post[]}, currentItem) => {
           const {date, ...item} = currentItem;
 
-          // Si es un array se añade y NO se reeplaza
           if (Array.isArray(acc[date])) {
             acc[date].push(item);
           } else {
@@ -108,9 +109,18 @@ const App: React.FC = () => {
     );
   };
 
+  const renderItem = (item: Item) => {
+    return (
+      <>
+        <Card item={item} />
+        <ModalAction />
+      </>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
-      <Agenda items={items} renderItem={Card} />
+      <Agenda items={items} renderItem={renderItem} />
     </SafeAreaView>
   );
 };
