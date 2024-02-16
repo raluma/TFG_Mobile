@@ -1,55 +1,59 @@
-import * as React from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { Item } from '../types/agenda';
 import { db } from '../../firebase';
 import { collection, doc, addDoc, deleteDoc } from 'firebase/firestore';
+import { useModalStore } from '../services/modalStage';
 
-const Card = (item: Item) => {
+const Card = ({ item }) => {
+    const setId = useModalStore((state: any) => state.setId);
+    const setVisible = useModalStore((state: any) => state.setVisible);
 
     const addEvent = async () => {
-        try {
-            const docRef = await addDoc(collection(db, "Events"), { 
-                id: 1,
-                name: "Tarea",
-                tag: "Prueba",
-                date: "2024-02-13",
-                time: "16:00 - 17:00",
-                height: 0,
-                day: "13",
-                userId: 1
-            });
+        // try {
+        //     const docRef = await addDoc(collection(db, "Events"), { 
+        //         id: 1,
+        //         name: "Tarea",
+        //         tag: "Prueba",
+        //         date: "2024-02-13",
+        //         time: "16:00 - 17:00",
+        //         height: 0,
+        //         day: "13",
+        //         userId: 1
+        //     });
 
-            console.log("Documento escrito con el ID: ", docRef.id);
-        } catch (error) {
-            console.error("Error documento no escrito: ", error);
-        }
-
+        //     console.log("Documento escrito con el ID: ", docRef.id);
+        // } catch (error) {
+        //     console.error("Error documento no escrito: ", error);
+        // }
+        setId(item.id);
+        setVisible(true);
     }
 
     const dropEvent = async (eventId: string) => {
-        try {
-            await deleteDoc(doc(db, "Events", eventId));
-            console.log("Documento borrado con el ID: ", eventId);
-        } catch (error) {
-            console.error("Error documento no borrado: ", error);
-        }
+        // try {
+        //     await deleteDoc(doc(db, "Events", eventId));
+        //     console.log("Documento borrado con el ID: ", eventId);
+        // } catch (error) {
+        //     console.error("Error documento no borrado: ", error);
+        // }
     }
 
     return (
         <View style={styles.itemContainer}>
             <View style={styles.dataSection}>
-                <Text style={styles.time}>{item["time"]}</Text>
+                <Text style={styles.time}>{item.time}</Text>
                 <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.tag}>{item["tag"]}</Text>
+                <Text style={styles.tag}>{item.tag}</Text>
             </View>
 
             <View style={styles.imageSection}>
                 <View style={styles.toolsIcon}>
                     <Button icon={
-                        <FontAwesomeIcon icon={faPlus} size={20} />
+                        <FontAwesomeIcon icon={faEdit} size={20} />
                     } buttonStyle={styles.addIcon} 
                     onPress={addEvent} />
 
