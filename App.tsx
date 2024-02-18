@@ -1,134 +1,119 @@
-import { addDays, format } from 'date-fns';
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
-import { Agenda } from 'react-native-calendars';
-import Card from './src/components/Card';
-import ModalAction from './src/components/ModalAction';
-import { useModalStore } from './src/services/modalStage';
-import { Item, Post } from './src/types/agenda';
-import { db } from './firebase';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { StyleSheet } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { getHeaderTitle } from '@react-navigation/elements';
+import Header from './src/components/Header';
+import Home from './src/screens/Home';
+import Account from './src/screens/Account';
+import { useSessionStore } from './src/services/sessionStore';
+import { useModalStore } from './src/services/modalStore';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faHome, faAdd, faGear } from '@fortawesome/free-solid-svg-icons';
+import { Button } from 'react-native-elements';
+import Auth from './src/screens/Auth';
 
+const Tab = createBottomTabNavigator();
 
-const App: React.FC = () => {
-  const [items, setItems] = useState<{[key: string]: Post[]}>({});
+const App = () => {
+  const email: string = useSessionStore((state: any) => state.email);
+  const password: string = useSessionStore((state: any) => state.password);
+  const session = { email, password };
+  const setItem = useModalStore((state: any) => state.setItem);
+  const setVisible = useModalStore((state: any) => state.setVisible);
 
-  useEffect(() => {
-    // run once
+  const addEvent = async () => {
+    // try {
+    //     const docRef = await addDoc(collection(db, "Events"), { 
+    //         id: 1,
+    //         name: "Tarea",
+    //         tag: "Prueba",
+    //         date: "2024-02-13",
+    //         time: "16:00 - 17:00",
+    //         height: 0,
+    //         day: "13",
+    //         userId: 1
+    //     });
 
-    const getData = () => {
-
-      const data: Post[] = [
-        {
-          id: 1,
-          name: "Cocinar almuerzo",
-          tag: "Cocina",
-          time: "10:00 - 11:00",
-          height: 0,
-          day: "10",
-          userId: 1,
-        },
-        {
-          id: 2,
-          name: "Ir a la cancha",
-          tag: "Deporte",
-          time: "10:00 - 11:00",
-          height: 0,
-          day: "12",
-          userId: 1,
-        }
-      ]
-
-      const mappedData = data.map((post, index) => {
-        // const date = addDays(new Date(), index);
-        const date = "2024-02-16";
-
-        return {
-          ...post,
-          date: date,
-        };
-      });
-
-      const reduced = mappedData.reduce(
-        (acc: {[key: string]: Post[]}, currentItem) => {
-          const {date, ...item} = currentItem;
-
-          if (Array.isArray(acc[date])) {
-            acc[date].push(item);
-          } else {
-            acc[date] = [item];
-          }
-
-          return acc;
-        },
-        {},
-      );
-
-      setItems(reduced);
-    };
-
-    // const getData = onSnapshot(collection(db, "Events"), (snapshot) => {
-    //   const mappedData = snapshot.docs.map((doc, index) => {
-
-    //     return {
-    //       ...{ 
-    //         id: parseInt(doc.id), 
-    //         name: doc.data()["name"], 
-    //         tag: doc.data()["tag"],
-    //         time: doc.data()["time"],
-    //         height: parseInt(doc.data()["height"]), 
-    //         day: doc.data()["day"], 
-    //         userId: parseInt(doc.data()["userId"])
-    //       },
-    //       date: doc.data()["date"],
-    //     };
-    //   });
-
-    //   const reduced = mappedData.reduce(
-    //     (acc: {[key: string]: Post[]}, currentItem) => {
-    //       const {date, ...coolItem} = currentItem;
-
-    //       acc[date] = [coolItem];
-
-    //       return acc;
-    //     },
-    //     {},
-    //   );
-
-    //   setItems(reduced);
-    // });
-
-    getData();
-  }, []);
-
-  const renderEmptyDate = () => {
-    return (
-      <View>
-        <Text>This is empty date!</Text>
-      </View>
-    );
-  };
-
-  const renderItem = (item: Item) => {
-    return (
-      <>
-        <Card item={item} />
-        <ModalAction />
-      </>
-    );
-  };
+    //     console.log("Documento escrito con el ID: ", docRef.id);
+    // } catch (error) {
+    //     console.error("Error documento no escrito: ", error);
+    // }
+    setItem(undefined);
+    setVisible(true);
+  }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <Agenda items={items} renderItem={renderItem} />
-    </SafeAreaView>
-  );
-};
+    <>
+    { 
+      email !== undefined ?
+        <NavigationContainer>
+          <Tab.Navigator
+            screenOptions={({ route }) => ({
+              tabBarShowLabel: false,
+              tabBarIcon: ({ focused }) => {
+                return <FontAwesomeIcon  icon={ 
+                  route.name === 'Home' ? faHome 
+                  : route.name === 'Add' ? faAdd 
+                  : faGear
+                } 
+                color={
+                  focused && route.name === 'Home' ? 'blue' 
+                  : focused && route.name === 'Add' ? 'red'
+                  : focused && route.name === 'Account' ? 'orange'
+                  : 'black'
+                }  size={30} />
+              },
+              tabBarActiveTintColor: 'black',
+              tabBarInactiveTintColor: 'black',
+              header: ({ route, options, navigation }) => {
+                const title = getHeaderTitle(options, route.name);
+              
+                return <Header title={title} session={session} />;
+              }
+            })}
+          >
+            <Tab.Screen 
+              name='Home' 
+              children={()=> <Home session={session} />}
+            />
+
+            <Tab.Screen 
+              name='Add' 
+              children={()=> <Home session={session} />}
+              options={{
+                tabBarButton: () => {
+                  return (
+                    <Button icon={
+                      <FontAwesomeIcon icon={faAdd} size={20} />
+                    } buttonStyle={styles.addIcon} 
+                    onPress={addEvent} />
+                  );
+                }
+              }}
+            />
+
+            <Tab.Screen 
+              name='Account' 
+              children={()=> <Account session={session} />}
+            />
+
+          </Tab.Navigator>
+        </NavigationContainer>
+      :
+        <Auth />
+      }
+    </>
+  )
+}
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
+  addIcon: {
+    padding: 6,
+    borderWidth: 2,
+    borderRadius: 40,
+    borderColor: "black",
+    backgroundColor: "white"
   }
-});
+})
 
 export default App;
