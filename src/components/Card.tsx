@@ -1,35 +1,19 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
+import { Avatar } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEdit, faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import { Item } from '../types/agenda';
+import { useModalStore } from '../services/modalStore';
 import { db } from '../../firebase';
-import { collection, doc, addDoc, deleteDoc } from 'firebase/firestore';
-import { useModalStore } from '../services/modalStage';
+import { doc, deleteDoc } from 'firebase/firestore';
 
 const Card = ({ item }) => {
-    const setId = useModalStore((state: any) => state.setId);
+    const setItem = useModalStore((state: any) => state.setItem);
     const setVisible = useModalStore((state: any) => state.setVisible);
 
-    const addEvent = async () => {
-        // try {
-        //     const docRef = await addDoc(collection(db, "Events"), { 
-        //         id: 1,
-        //         name: "Tarea",
-        //         tag: "Prueba",
-        //         date: "2024-02-13",
-        //         time: "16:00 - 17:00",
-        //         height: 0,
-        //         day: "13",
-        //         userId: 1
-        //     });
-
-        //     console.log("Documento escrito con el ID: ", docRef.id);
-        // } catch (error) {
-        //     console.error("Error documento no escrito: ", error);
-        // }
-        setId(item.id);
+    const updateAction = () => {
+        setItem(item.id);
         setVisible(true);
     }
 
@@ -51,11 +35,13 @@ const Card = ({ item }) => {
             </View>
 
             <View style={styles.imageSection}>
+                <Avatar.Text size={60} label={"ra"} />
+                
                 <View style={styles.toolsIcon}>
                     <Button icon={
                         <FontAwesomeIcon icon={faEdit} size={20} />
-                    } buttonStyle={styles.addIcon} 
-                    onPress={addEvent} />
+                    } buttonStyle={styles.updateIcon} 
+                    onPress={updateAction} />
 
                     <Button icon={
                         <FontAwesomeIcon icon={faTrashCan} size={20} />
@@ -72,11 +58,10 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         flexWrap: "wrap",
-        gap: 20,
+        gap: 10,
         marginTop: 12,
         marginRight: 16,
         paddingHorizontal: 20,
-        paddingVertical: 20,
         height: 130,
         backgroundColor: "white"
     },
@@ -84,6 +69,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
+        paddingVertical: 20,
         width: 160,
         height: 90
     }, 
@@ -104,9 +90,13 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         flexWrap: "wrap",
-        justifyContent: "flex-end",
-        width: 90,
-        height: 90
+        justifyContent: "center",
+        gap: 6,
+        paddingVertical: 10,
+        width: 120,
+        height: 90,
+        // borderWidth: 2,
+        // borderColor: 'red'
     },
     toolsIcon: {
         display: "flex",
@@ -114,7 +104,7 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
         gap: 6
     },
-    addIcon: {
+    updateIcon: {
         padding: 6,
         borderWidth: 2,
         borderRadius: 40,
