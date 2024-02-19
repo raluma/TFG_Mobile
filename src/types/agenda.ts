@@ -3,9 +3,10 @@ export type Item = {
 };
 
 export type Post = {
-    id: number;
+    id: string;
     name: string;
     tag: string;
+    description: string;
     time: string;
     height: number;
     day: string;
