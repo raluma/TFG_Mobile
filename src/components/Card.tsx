@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 import { Avatar } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -13,17 +13,15 @@ const Card = ({ item }) => {
     const setVisible = useModalStore((state: any) => state.setVisible);
 
     const updateAction = () => {
-        setItem(item.id);
+        setItem(item);
         setVisible(true);
     }
 
     const dropEvent = async (eventId: string) => {
-        // try {
-        //     await deleteDoc(doc(db, "Events", eventId));
-        //     console.log("Documento borrado con el ID: ", eventId);
-        // } catch (error) {
-        //     console.error("Error documento no borrado: ", error);
-        // }
+        try {
+            await deleteDoc(doc(db, "Events", eventId));
+            Alert.alert("", "El evento se ha borrado con éxito")
+        } catch (error) {}
     }
 
     return (
@@ -46,7 +44,7 @@ const Card = ({ item }) => {
                     <Button icon={
                         <FontAwesomeIcon icon={faTrashCan} size={20} />
                     } buttonStyle={styles.dropIcon} 
-                    onPress={() => dropEvent("86qjlFxnOlLJBNZ3OyCc")} />
+                    onPress={() => dropEvent(item.id)} />
                 </View>
             </View>
         </View>
