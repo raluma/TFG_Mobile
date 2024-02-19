@@ -6,9 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEdit, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { useModalStore } from '../services/modalStore';
 import { db } from '../../firebase';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, doc, getDocs, deleteDoc } from 'firebase/firestore';
 
-const Card = ({ item }) => {
+const Card = ({ item, session }) => {
+    const { id } = session;
     const setItem = useModalStore((state: any) => state.setItem);
     const setVisible = useModalStore((state: any) => state.setVisible);
 
@@ -19,9 +20,21 @@ const Card = ({ item }) => {
 
     const dropEvent = async (eventId: string) => {
         try {
-            await deleteDoc(doc(db, "Events", eventId));
-            Alert.alert("", "El evento se ha borrado con éxito")
-        } catch (error) {}
+            const q = query(collection(db, "Events"), where("id", "==", eventId));
+            const querySnapchot =  await getDocs(q);
+
+            // Busco el evento y pregunto si el userId es el de la cuenta iniciada
+            if (querySnapchot.size === 1) {
+                querySnapchot.forEach(async (qDoc) => {
+                    if (qDoc.id === id) {
+                        await deleteDoc(doc(db, "Events", eventId));
+                        Alert.alert("", "The event has been successfully deleted");
+                    }
+                })
+              }
+        } catch (error) {
+            Alert.alert("", "The event has not been successfully deleted");
+        }
     }
 
     return (
@@ -93,8 +106,6 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         width: 120,
         height: 90,
-        // borderWidth: 2,
-        // borderColor: 'red'
     },
     toolsIcon: {
         display: "flex",
