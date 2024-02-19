@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import { StyleSheet, View, Alert } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Avatar, TextInput, Button } from 'react-native-paper';
 import { useSessionStore } from '../services/sessionStore';
 
 const Account = ({ session }) => {
-    const setPassword = useSessionStore((state: any) => state.setPassword);
-    const { email, password } = session;
+    const setAccount = useSessionStore((state: any) => state.setAccount);
+    const { id, email, password } = session;
     const shortEmail = email.substring(0, 2);
 
+    const [newEmail, setNewEmail] = useState(email);
     const [newPassword, setNewPassword] = useState(password);
     const [hidden, setHidden] = useState(true);
-
+    
     const onPressUpdate = () => {
-        setPassword(email, newPassword);
-        Alert.alert('', 'Successful update');
+        setAccount(id, email, newEmail, newPassword);
     }
 
     return (
@@ -23,8 +23,8 @@ const Account = ({ session }) => {
             <TextInput
                 label="Email"
                 mode="outlined"
-                value={email}
-                disabled={true}
+                value={newEmail}
+                onChangeText={email => setNewEmail(email)}
                 style={styles.textInput}
             />
 
