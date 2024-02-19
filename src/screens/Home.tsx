@@ -54,8 +54,8 @@ const Home = ({ session }) => {
   const renderItem = (item: Item) => {
     return (
       <>
-        <Card item={item} />
-        <ModalAction />
+        <Card item={item} session={session} />
+        <ModalAction session={session} />
       </>
     );
   };
