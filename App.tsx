@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { getHeaderTitle } from '@react-navigation/elements';
@@ -11,33 +11,27 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHome, faAdd, faGear } from '@fortawesome/free-solid-svg-icons';
 import { Button } from 'react-native-elements';
 import Auth from './src/screens/Auth';
+import { useEffect } from 'react';
 
 const Tab = createBottomTabNavigator();
 
 const App = () => {
+  const actions: number = useSessionStore((state: any) => state.actions);
+  const id: string = useSessionStore((state: any) => state.id);
   const email: string = useSessionStore((state: any) => state.email);
   const password: string = useSessionStore((state: any) => state.password);
-  const session = { email, password };
+  const response: string = useSessionStore((state: any) => state.response);
+  const session = { id, email, password };
   const setItem = useModalStore((state: any) => state.setItem);
   const setVisible = useModalStore((state: any) => state.setVisible);
 
-  const addEvent = async () => {
-    // try {
-    //     const docRef = await addDoc(collection(db, "Events"), { 
-    //         id: 1,
-    //         name: "Tarea",
-    //         tag: "Prueba",
-    //         date: "2024-02-13",
-    //         time: "16:00 - 17:00",
-    //         height: 0,
-    //         day: "13",
-    //         userId: 1
-    //     });
+  useEffect(() => {
+    setTimeout(() => {
+      if (response !== undefined) Alert.alert("", response);
+    }, 1000);
+  }, [actions]);
 
-    //     console.log("Documento escrito con el ID: ", docRef.id);
-    // } catch (error) {
-    //     console.error("Error documento no escrito: ", error);
-    // }
+  const addEvent = async () => {
     setItem(undefined);
     setVisible(true);
   }
