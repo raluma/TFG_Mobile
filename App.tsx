@@ -20,14 +20,14 @@ const App = () => {
   const id: string = useSessionStore((state: any) => state.id);
   const email: string = useSessionStore((state: any) => state.email);
   const password: string = useSessionStore((state: any) => state.password);
-  const response: string = useSessionStore((state: any) => state.response);
+  const authResponse: string = useSessionStore((state: any) => state.authResponse);
   const session = { id, email, password };
   const setItem = useModalStore((state: any) => state.setItem);
   const setVisible = useModalStore((state: any) => state.setVisible);
 
   useEffect(() => {
     setTimeout(() => {
-      if (response !== undefined) Alert.alert("", response);
+      if (authResponse !== undefined) Alert.alert("", authResponse);
     }, 1000);
   }, [actions]);
 
