@@ -1,45 +1,61 @@
-import React, { useState } from 'react';
-import { Modal, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Modal, StyleSheet, Text, View, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
-import { Avatar, TextInput } from 'react-native-paper';
+import { TextInput } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useModalStore } from '../services/modalStore';
 import { db } from '../../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 
 const ModalAction = () => {
   const item = useModalStore((state: any) => state.item);
   const visible = useModalStore((state: any) => state.visible);
   const setVisible = useModalStore((state: any) => state.setVisible);
 
-  const actors = ["raul", "lucia", "sara", "juan", "carlos"];
+  const [name, setName] = useState(undefined);
+  const [desc, setDesc] = useState(undefined);
+  const [tag, setTag] = useState(undefined);
 
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
-  const [tag, setTag] = useState("");
+  useEffect(() => {
+    if (item === undefined) {
+      setName("");
+      setDesc("");
+      setTag("");
+    } else {
+      setName(item.name);
+      setDesc(item.desc);
+      setTag(item.tag);
+    }
+  }, [item])
 
   const addEvent = async () => {
-    // try {
-    //   const docRef = await addDoc(collection(db, "Events"), { 
-    //       id: 1,
-    //       name: "Tarea",
-    //       tag: "Prueba",
-    //       date: "2024-02-13",
-    //       time: "16:00 - 17:00",
-    //       height: 0,
-    //       day: "13",
-    //       userId: 1
-    //   });
+    try {
+      await addDoc(collection(db, "Events"), { 
+          name: name,
+          description: desc,
+          tag: tag,
+          date: "2024-02-18",
+          time: "16:00 - 17:00",
+          height: 0,
+          day: "13",
+          userId: 1
+      });
 
-    //   console.log("Documento escrito con el ID: ", docRef.id);
-    // } catch (error) {
-    //     console.error("Error documento no escrito: ", error);
-    // }
+      Alert.alert("", "El evento se ha añadido con éxito")
+    } catch (error) {}
   }
 
-  const updateEvent = async () => {
+  const updateEvent = async (eventId: string) => {
+    try {
+      await updateDoc(doc(db, "Events", eventId), {
+        name: name,
+        description: desc,
+        tag: tag
+      });
 
+      Alert.alert("", "El evento se ha actualizado con éxito")
+    } catch (error) {}
   }
   
   return (
@@ -88,16 +104,18 @@ const ModalAction = () => {
                 style={styles.textInput}
               />
 
-              <View style={styles.actorsView}>
-                <Text style={styles.actorsTitle}>People</Text>
-                { 
-                  actors.map((actor: string, index: number) => {
-                    return (
-                      <Avatar.Text key={index} size={40} label={actor.substring(0, 2)} />
-                    ) 
-                  })
-                }
-              </View>
+              <Button buttonStyle={styles.buttonSubmit} 
+                onPress={() => {
+                  if (item === undefined) {
+                    addEvent();
+                  } else {
+                    updateEvent(item.id)
+                  }
+                }} 
+                title={ item === undefined ? "Add" : "Update" }
+              />
+
+              
             </View>
           </View>
         </View>
@@ -155,18 +173,10 @@ const styles = StyleSheet.create({
     margin: 'auto',
     width: 270
   },
-  actorsView: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    rowGap: 20
-  },
-  actorsTitle: {
-    textAlign: 'center',
-    width: 310,
-    fontWeight: 'bold',
-    fontSize: 20
+  buttonSubmit: {
+    backgroundColor: 'black',
+    width: 160,
+    borderRadius: 2
   }
 });
 
