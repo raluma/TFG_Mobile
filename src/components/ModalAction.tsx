@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, StyleSheet, Text, View, Alert } from 'react-native';
+import { SafeAreaView, Modal, StyleSheet, Text, View, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 import { TextInput } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faCalendarDays, faClock } from '@fortawesome/free-solid-svg-icons';
 import { useModalStore } from '../services/modalStore';
 import { db } from '../../firebase';
-import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { collection, query, where, doc, getDocs, addDoc, updateDoc  } from 'firebase/firestore';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
-const ModalAction = () => {
+const ModalAction = ({ session }) => {
+  const { id } = session;
   const item = useModalStore((state: any) => state.item);
   const visible = useModalStore((state: any) => state.visible);
   const setVisible = useModalStore((state: any) => state.setVisible);
@@ -16,6 +18,29 @@ const ModalAction = () => {
   const [name, setName] = useState(undefined);
   const [desc, setDesc] = useState(undefined);
   const [tag, setTag] = useState(undefined);
+  const [date, setDate] = useState(new Date());
+
+  const onChange = (_event: any, selectedDate: any) => {
+    const currentDate = selectedDate;
+    setDate(currentDate);
+  };
+
+  const showMode = (currentMode: any) => {
+    DateTimePickerAndroid.open({
+      value: date,
+      onChange,
+      mode: currentMode,
+      is24Hour: true,
+    });
+  };
+
+  const showDatepicker = () => {
+    showMode('date');
+  };
+
+  const showTimepicker = () => {
+    showMode('time');
+  };
 
   useEffect(() => {
     if (item === undefined) {
@@ -30,32 +55,50 @@ const ModalAction = () => {
   }, [item])
 
   const addEvent = async () => {
+    const arr_date = date.toISOString().split("T");
+    const str_date = arr_date[0];
+    const str_time = arr_date[1].substring(0, 5);
+
     try {
       await addDoc(collection(db, "Events"), { 
           name: name,
           description: desc,
           tag: tag,
-          date: "2024-02-18",
-          time: "16:00 - 17:00",
+          date: str_date,
+          time: str_time,
           height: 0,
-          day: "13",
-          userId: 1
+          day: 0,
+          userId: id
       });
 
-      Alert.alert("", "El evento se ha añadido con éxito")
-    } catch (error) {}
+      Alert.alert("", "The event has been successfully added");
+    } catch (error) {
+      Alert.alert("", "The event has not been added successfully");
+    }
   }
 
   const updateEvent = async (eventId: string) => {
     try {
-      await updateDoc(doc(db, "Events", eventId), {
-        name: name,
-        description: desc,
-        tag: tag
-      });
+      const q = query(collection(db, "Events"), where("id", "==", eventId));
+      const querySnapchot =  await getDocs(q);
 
-      Alert.alert("", "El evento se ha actualizado con éxito")
-    } catch (error) {}
+      // Busco el evento y pregunto si el userId es el de la cuenta iniciada
+      if (querySnapchot.size === 1) {
+        querySnapchot.forEach(async (qDoc) => {
+          if (qDoc.id === id) {
+            await updateDoc(doc(db, "Events", eventId), {
+              name: name,
+              description: desc,
+              tag: tag
+            });
+
+            Alert.alert("", "The event has been successfully updated")
+          }
+        })
+      }
+    } catch (error) {
+      Alert.alert("", "The event has not been updated successfully");
+    }
   }
   
   return (
@@ -104,6 +147,28 @@ const ModalAction = () => {
                 style={styles.textInput}
               />
 
+              <SafeAreaView style={styles.dateView}>
+                <View style={styles.dateIconView}>
+                  <Button
+                    icon={
+                      <FontAwesomeIcon icon={faCalendarDays} size={20} />
+                    }  
+                    buttonStyle={styles.dateBtns}
+                    onPress={showDatepicker}
+                  />
+                  <Button 
+                    icon={
+                      <FontAwesomeIcon icon={faClock} size={20} />
+                    }
+                    buttonStyle={styles.dateBtns}
+                    onPress={showTimepicker} 
+                  />
+                </View>
+                <Text style={styles.dateText}>
+                  Date: {date.toLocaleString()}
+                </Text>
+              </SafeAreaView>
+              
               <Button buttonStyle={styles.buttonSubmit} 
                 onPress={() => {
                   if (item === undefined) {
@@ -114,7 +179,6 @@ const ModalAction = () => {
                 }} 
                 title={ item === undefined ? "Add" : "Update" }
               />
-
               
             </View>
           </View>
@@ -128,8 +192,7 @@ const styles = StyleSheet.create({
   centeredView: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10
+    alignItems: 'center'
   },
   modalView: {
     width: 350,
@@ -158,7 +221,7 @@ const styles = StyleSheet.create({
   actionView: {
     flex: 1,
     alignItems: 'center',
-    rowGap: 40,
+    rowGap: 34,
     width: 310,
     marginTop: 20,
     marginHorizontal: 10
@@ -172,6 +235,26 @@ const styles = StyleSheet.create({
   textInput: {
     margin: 'auto',
     width: 270
+  },
+  dateView: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10
+  },
+  dateIconView: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 2
+  },
+  dateBtns: {
+    padding: 6,
+    borderWidth: 2,
+    borderColor: "black",
+    backgroundColor: "white"
+  },
+  dateText: {
+    fontSize: 24.2
   },
   buttonSubmit: {
     backgroundColor: 'black',
