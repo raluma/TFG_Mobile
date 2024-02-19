@@ -8,7 +8,7 @@ export default function Signup() {
     const signup = useSessionStore((state: any) => state.signup);
     const setAction = useAuthStore((state: any) => state.setAction);
     
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [password2, setPassword2] = useState("");
     
@@ -16,12 +16,12 @@ export default function Signup() {
     const [hidden2, setHidden2] = useState(true);
 
     const onPressSignup = () => {
-        if (username === '') {
-            Alert.alert('', 'Empty username');  
+        if (email === '') {
+            Alert.alert('', 'Empty email');  
         } else if (password !== password2) {
             Alert.alert('', 'Passwords do not match');  
         } else {
-            signup(username, password);
+            signup(email, password);
         }
     }
 
@@ -34,9 +34,9 @@ export default function Signup() {
             <Text style={styles.title}>Signup</Text>
     
             <TextInput
-                label="Username"
-                value={username}
-                onChangeText={username => setUsername(username)}
+                label="Email"
+                value={email}
+                onChangeText={email => setEmail(email)}
                 style={styles.textInput}
             />
 

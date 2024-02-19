@@ -8,12 +8,12 @@ const Login = () => {
     const login = useSessionStore((state: any) => state.login);
     const setAction = useAuthStore((state: any) => state.setAction);
 
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [hidden, setHidden] = useState(true);
 
     const onPressLogin = () => {
-        login(username, password);  
+        login(email, password);
     }
 
     const onPressSignup = () => {
@@ -25,9 +25,9 @@ const Login = () => {
             <Text style={styles.title}>Login</Text>
     
             <TextInput
-                label="Username"
-                value={username}
-                onChangeText={username => setUsername(username)}
+                label="Email"
+                value={email}
+                onChangeText={email => setEmail(email)}
                 style={styles.textInput}
             />
 
