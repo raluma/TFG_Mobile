@@ -8,7 +8,7 @@ export const useSessionStore = create((set) => {
     id: undefined,
     email: undefined,
     password: undefined,
-    response: undefined,
+    authResponse: undefined,
     signup: async (email: string, password: string) => {
       try {
         const q = query(collection(db, "Users"), where("email", "==", email));
@@ -16,14 +16,14 @@ export const useSessionStore = create((set) => {
 
         if (querySnapchot.size === 0) {
           await addDoc(collection(db, "Users"), { email, password });
-          set({ response: `You are successfully signed up` });
+          set({ authResponse: `You are successfully signed up` });
           set((state: any) => ({ actions: state.actions + 1 }))
         } else {
-          set({ response: `You are not successfully signed up. Email is in use.` });
+          set({ authResponse: `You are not successfully signed up. Email is in use.` });
           set((state: any) => ({ actions: state.actions + 1 }))
         }
       } catch (error) {
-        set({ response: `You are not successfully signed up` });
+        set({ authResponse: `You are not successfully signed up` });
         set((state: any) => ({ actions: state.actions + 1 }))
       }
     },
@@ -36,21 +36,21 @@ export const useSessionStore = create((set) => {
           if (password === doc.data()["password"]) {
             set({ id: doc.id });
             set({ email, password });
-            set({ response: `You are successfully logged in` });
+            set({ authResponse: `You are successfully logged in` });
             set((state: any) => ({ actions: state.actions + 1 }))
           } else {
-            set({ response: `Error, email or password is incorrect` });
+            set({ authResponse: `Error, email or password is incorrect` });
             set((state: any) => ({ actions: state.actions + 1 }))
           }
         })
       } else {
-        set({ response: `Error, email or password is incorrect` });
+        set({ authResponse: `Error, email or password is incorrect` });
         set((state: any) => ({ actions: state.actions + 1 }))
       }
     },
     logout: () => {
       set({ email: undefined, password: undefined });
-      set({ response: `You are successfully logged out` });
+      set({ authResponse: `You are successfully logged out` });
       set((state: any) => ({ actions: state.actions + 1 }))
     },
     setAccount: async (id: string, oldEmail: string, email: string, password: string) => { 
@@ -62,22 +62,22 @@ export const useSessionStore = create((set) => {
           await updateDoc(doc(db, "Users", id), { email, password });
           set({ email });
           set({ password });
-          set({ response: `You have successfully updated your account` });
+          set({ authResponse: `You have successfully updated your account` });
           set((state: any) => ({ actions: state.actions + 1 }))
         } else if (oldEmail === email) {
           querySnapchot.forEach(async () => {
             await updateDoc(doc(db, "Users", id), { email, password });
             set({ email });
             set({ password });
-            set({ response: `You have successfully updated your account` });
+            set({ authResponse: `You have successfully updated your account` });
             set((state: any) => ({ actions: state.actions + 1 }))
           });
         } else {
-          set({ response: `You have not successfully updated your account. Email is in use.` });
+          set({ authResponse: `You have not successfully updated your account. Email is in use.` });
           set((state: any) => ({ actions: state.actions + 1 }))
         }
       } catch(error) {
-        set({ response: `You have not successfully updated your account` });
+        set({ authResponse: `You have not successfully updated your account` });
         set((state: any) => ({ actions: state.actions + 1 }))
       }
     }
