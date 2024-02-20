@@ -92,9 +92,13 @@ const ModalAction = ({ session }) => {
               tag: tag
             });
 
-            Alert.alert("", "The event has been successfully updated")
+            Alert.alert("", "The event has been successfully updated");
+          } else {
+            Alert.alert("", "The event has not been successfully updated. You do not have permissions.");
           }
         })
+      } else {
+        Alert.alert("", "The event no longer exists");
       }
     } catch (error) {
       Alert.alert("", "The event has not been updated successfully");
