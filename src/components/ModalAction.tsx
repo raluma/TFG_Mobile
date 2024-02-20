@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faXmark, faCalendarDays, faClock } from '@fortawesome/free-solid-svg-icons';
 import { useModalStore } from '../services/modalStore';
 import { db } from '../../firebase';
-import { collection, query, where, doc, getDocs, addDoc, updateDoc  } from 'firebase/firestore';
+import { collection, doc, getDoc, addDoc, updateDoc  } from 'firebase/firestore';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 const ModalAction = ({ session }) => {
@@ -79,26 +79,23 @@ const ModalAction = ({ session }) => {
 
   const updateEvent = async (eventId: string) => {
     try {
-      const q = query(collection(db, "Events"), where("id", "==", eventId));
-      const querySnapchot =  await getDocs(q);
+      const docRef = doc(db, "Events", eventId);
+      const docSnap = await getDoc(docRef);
 
-      // Busco el evento y pregunto si el userId es el de la cuenta iniciada
-      if (querySnapchot.size === 1) {
-        querySnapchot.forEach(async (qDoc) => {
-          if (qDoc.id === id) {
-            await updateDoc(doc(db, "Events", eventId), {
-              name: name,
-              description: desc,
-              tag: tag
-            });
+      if (docSnap.data() !== undefined) {
+        if (id === docSnap.data()["userId"]) {
+          await updateDoc(doc(db, "Events", eventId), {
+            name: name,
+            description: desc,
+            tag: tag
+          });
 
-            Alert.alert("", "The event has been successfully updated");
-          } else {
-            Alert.alert("", "The event has not been successfully updated. You do not have permissions.");
-          }
-        })
+          Alert.alert("", "The event has been successfully updated");
+        } else {
+          Alert.alert("", "The event has not been successfully updated. You do not have permissions.");
+        }
       } else {
-        Alert.alert("", "The event no longer exists");
+        Alert.alert("", "The event has not been successfully updated. The event no longer exists.");
       }
     } catch (error) {
       Alert.alert("", "The event has not been updated successfully");
