@@ -39,12 +39,12 @@ export const useSessionStore = create((set) => {
             set({ authResponse: `You are successfully logged in` });
             set((state: any) => ({ actions: state.actions + 1 }))
           } else {
-            set({ authResponse: `Error, email or password is incorrect` });
+            set({ authResponse: `Error, password is incorrect` });
             set((state: any) => ({ actions: state.actions + 1 }))
           }
         })
       } else {
-        set({ authResponse: `Error, email or password is incorrect` });
+        set({ authResponse: `Error, email is incorrect` });
         set((state: any) => ({ actions: state.actions + 1 }))
       }
     },
