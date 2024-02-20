@@ -32,19 +32,16 @@ const Card = ({ item, session }) => {
 
     const dropEvent = async (eventId: string) => {
         try {
-            const q = query(collection(db, "Events"), where("id", "==", eventId));
-            const querySnapchot =  await getDocs(q);
+            const docRef = doc(db, "Events", eventId);
+            const docSnap = await getDoc(docRef);
 
-            // Busco el evento y pregunto si el userId es el de la cuenta iniciada
-            if (querySnapchot.size === 1) {
-                querySnapchot.forEach(async (qDoc) => {
-                    if (qDoc.id === id) {
-                        await deleteDoc(doc(db, "Events", eventId));
-                        Alert.alert("", "The event has been successfully deleted");
-                    } else {
-                        Alert.alert("", "The event has not been successfully deleted. You do not have permissions.");
-                    }
-                })
+            if (docSnap.data() !== undefined) {
+                if (id === docSnap.data()["userId"]) {
+                    await deleteDoc(doc(db, "Events", eventId));
+                    Alert.alert("", "The event has been successfully deleted");
+                } else {
+                    Alert.alert("", "The event has not been successfully deleted. You do not have permissions.");
+                }
             } else {
                 Alert.alert("", "The event has already been successfully deleted");
             }
