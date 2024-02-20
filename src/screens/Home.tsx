@@ -19,6 +19,7 @@ const Home = ({ session }) => {
       const mappedData = snapshot.docs.map((doc) => {
         return {
           ...{ 
+            id: doc.id,
             name: doc.data()["name"], 
             desc: doc.data()["description"],
             tag: doc.data()["tag"],
@@ -34,6 +35,7 @@ const Home = ({ session }) => {
       const date = new Date();
 
       mappedData.push({
+        id: "",
         name: "",
         desc: "",
         tag: "",

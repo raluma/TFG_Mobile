@@ -8,6 +8,7 @@ import { useModalStore } from '../services/modalStore';
 import { db } from '../../firebase';
 import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 
+
 const Card = ({ item, session }) => {
     const { id } = session;
     const setItem = useModalStore((state: any) => state.setItem);
