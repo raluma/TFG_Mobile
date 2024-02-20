@@ -15,7 +15,7 @@ const Home = ({ session }) => {
     // run once
 
     onSnapshot(collection(db, "Events"), (snapshot) => {
-      const mappedData = snapshot.docs.map((doc, index) => {
+      const mappedData = snapshot.docs.map((doc) => {
         return {
           ...{ 
             id: doc.id, 
@@ -25,7 +25,7 @@ const Home = ({ session }) => {
             time: doc.data()["time"],
             height: parseInt(doc.data()["height"]), 
             day: doc.data()["day"], 
-            userId: parseInt(doc.data()["userId"])
+            userId: doc.data()["userId"]
           },
           date: doc.data()["date"],
         };
