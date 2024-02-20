@@ -84,10 +84,16 @@ const ModalAction = ({ session }) => {
 
       if (docSnap.data() !== undefined) {
         if (id === docSnap.data()["userId"]) {
+          const arr_date = date.toISOString().split("T");
+          const str_date = arr_date[0];
+          const str_time = arr_date[1].substring(0, 5);
+
           await updateDoc(doc(db, "Events", eventId), {
             name: name,
             description: desc,
-            tag: tag
+            tag: tag,
+            date: str_date,
+            time: str_time,
           });
 
           Alert.alert("", "The event has been successfully updated");
