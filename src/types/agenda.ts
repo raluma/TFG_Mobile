@@ -10,5 +10,5 @@ export type Post = {
     time: string;
     height: number;
     day: string;
-    userId: number;
+    userId: string;
 };
