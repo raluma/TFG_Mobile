@@ -1,3 +1,4 @@
+import {addDays, format} from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import { Agenda } from 'react-native-calendars';
@@ -18,7 +19,6 @@ const Home = ({ session }) => {
       const mappedData = snapshot.docs.map((doc) => {
         return {
           ...{ 
-            id: doc.id, 
             name: doc.data()["name"], 
             desc: doc.data()["description"],
             tag: doc.data()["tag"],
@@ -30,6 +30,19 @@ const Home = ({ session }) => {
           date: doc.data()["date"],
         };
       })
+
+      const date = new Date();
+
+      mappedData.push({
+        name: "",
+        desc: "",
+        tag: "",
+        time: "",
+        height: 0,
+        day: "",
+        userId: "",
+        date: date.toISOString().split("T")[0]
+      });
 
       const reduced = mappedData.reduce(
         (acc: {[key: string]: Post[]}, currentItem) => {
