@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Alert } from 'react-native';
 import { Button } from 'react-native-elements';
 import { Avatar } from 'react-native-paper';
@@ -6,12 +6,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEdit, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { useModalStore } from '../services/modalStore';
 import { db } from '../../firebase';
-import { collection, query, where, doc, getDocs, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, doc, getDoc, getDocs, deleteDoc } from 'firebase/firestore';
 
 const Card = ({ item, session }) => {
     const { id } = session;
     const setItem = useModalStore((state: any) => state.setItem);
     const setVisible = useModalStore((state: any) => state.setVisible);
+    const [owner, setOwner] = useState("");
+
+    useEffect(() => {
+        const getOwner = async () => {
+            const docRef = doc(db, "Users", item.userId);
+            const docSnap = await getDoc(docRef);
+
+            setOwner(docSnap.data()["email"]);
+        }
+
+        getOwner();
+    }, [owner])
 
     const updateAction = () => {
         setItem(item);
@@ -29,9 +41,13 @@ const Card = ({ item, session }) => {
                     if (qDoc.id === id) {
                         await deleteDoc(doc(db, "Events", eventId));
                         Alert.alert("", "The event has been successfully deleted");
+                    } else {
+                        Alert.alert("", "The event has not been successfully deleted. You do not have permissions.");
                     }
                 })
-              }
+            } else {
+                Alert.alert("", "The event has already been successfully deleted");
+            }
         } catch (error) {
             Alert.alert("", "The event has not been successfully deleted");
         }
@@ -46,7 +62,9 @@ const Card = ({ item, session }) => {
             </View>
 
             <View style={styles.imageSection}>
-                <Avatar.Text size={60} label={"ra"} />
+                <Avatar.Text size={60} label={
+                    owner !== undefined ? owner.substring(0, 2) : ""
+                } />
                 
                 <View style={styles.toolsIcon}>
                     <Button icon={
