@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faEdit, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { useModalStore } from '../services/modalStore';
 import { db } from '../../firebase';
-import { collection, query, where, doc, getDoc, getDocs, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 
 const Card = ({ item, session }) => {
     const { id } = session;
@@ -51,31 +51,38 @@ const Card = ({ item, session }) => {
     }
 
     return (
-        <View style={styles.itemContainer}>
-            <View style={styles.dataSection}>
-                <Text style={styles.time}>{item.time}</Text>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.tag}>{item.tag}</Text>
-            </View>
+        <>
+            {
+                item.time !== "" ?
+                    <View style={styles.itemContainer}>
+                        <View style={styles.dataSection}>
+                            <Text style={styles.time}>{item.time}</Text>
+                            <Text style={styles.name}>{item.name}</Text>
+                            <Text style={styles.tag}>{item.tag}</Text>
+                        </View>
 
-            <View style={styles.imageSection}>
-                <Avatar.Text size={60} label={
-                    owner !== undefined ? owner.substring(0, 2) : ""
-                } />
-                
-                <View style={styles.toolsIcon}>
-                    <Button icon={
-                        <FontAwesomeIcon icon={faEdit} size={20} />
-                    } buttonStyle={styles.updateIcon} 
-                    onPress={updateAction} />
+                        <View style={styles.imageSection}>
+                            <Avatar.Text size={60} label={
+                                owner !== undefined ? owner.substring(0, 2) : ""
+                            } />
+                            
+                            <View style={styles.toolsIcon}>
+                                <Button icon={
+                                    <FontAwesomeIcon icon={faEdit} size={20} />
+                                } buttonStyle={styles.updateIcon} 
+                                onPress={updateAction} />
 
-                    <Button icon={
-                        <FontAwesomeIcon icon={faTrashCan} size={20} />
-                    } buttonStyle={styles.dropIcon} 
-                    onPress={() => dropEvent(item.id)} />
-                </View>
-            </View>
-        </View>
+                                <Button icon={
+                                    <FontAwesomeIcon icon={faTrashCan} size={20} />
+                                } buttonStyle={styles.dropIcon} 
+                                onPress={() => dropEvent(item.id)} />
+                            </View>
+                        </View>
+                    </View>
+                : 
+                ""
+            }
+        </>
     )
 };
 
